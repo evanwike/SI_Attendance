@@ -21,15 +21,16 @@ class IOFrame(tk.Frame):
             label.grid(row=i, column=0, sticky='e')
 
         # Text Inputs
-        self.responses_path = tk.StringVar()
-        self.roster_path = tk.StringVar()
-        self.output_path = tk.StringVar()
-
-        entries = [tk.Entry(self, textvariable=self.responses_path, state='readonly'),
-                   tk.Entry(self, textvariable=self.roster_path, state='readonly'),
-                   tk.Entry(self, textvariable=self.output_path, state='readonly')]
-        for i, entry in enumerate(entries):
+        self.paths = [tk.StringVar(), tk.StringVar(), tk.StringVar()]
+        self.entries = [tk.Entry(self, textvariable=self.paths[0], state='readonly'),
+                        tk.Entry(self, textvariable=self.paths[1], state='readonly'),
+                        tk.Entry(self, textvariable=self.paths[2], state='readonly')]
+        for i, entry in enumerate(self.entries):
             entry.grid(row=i, column=1)
+
+        # Set defaults to clear errors
+        styles.default_highlight_bg = self.entries[0].cget('highlightbackground')
+        styles.default_highlight_thickness = self.entries[0].cget('highlightthickness')
 
         # Buttons
         btn_font = Font(family=styles.btn_font)
@@ -40,37 +41,66 @@ class IOFrame(tk.Frame):
             button.bind(
                 '<Button-1>',
                 [self.browse_responses_path,
-                 self.browse_roster_path,
+                 self.browse_rosters_path,
                  self.save_output_path][i])
             button['font'] = btn_font
             button.grid(row=i, column=2)
 
-    def browse_responses_path(self, e):
+    def browse_responses_path(self, event: object) -> None:
+        # TODO: Fix / to work with OSX and Windows
+        self.clear_error(0)
         responses_path = tk.filedialog.askopenfilename(
-            initialdir="/",
+            initialdir="/Users/Evan/SI_Attendance/data/",
             title="Select the Responses Workbook.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004", "*.xls")))
-        self.responses_path = responses_path
+        self.paths[0].set(responses_path)
 
-    def browse_roster_path(self, e):
+    def browse_rosters_path(self, event: object) -> None:
+        self.clear_error(1)
         roster_path = tk.filedialog.askopenfilename(
-            initialdir="/",
+            initialdir="/Users/Evan/SI_Attendance/data/",
             title="Select the Rosters Workbook.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004 Workbook", "*.xls")))
-        self.roster_path.set(roster_path)
+        self.paths[1].set(roster_path)
 
-    def save_output_path(self, e):
+    def save_output_path(self, event: object) -> None:
+        self.clear_error(2)
         output_path = filedialog.asksaveasfilename(
-            initialdir="/",
+            initialdir="/Users/Evan/downloads/",
             title="Select where to save the output file.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004 Workbook", "*.xls")))
-        self.output_path.set(output_path)
+        self.paths[2].set(output_path)
 
-    def get_response_path(self):
-        return self.responses_path
+    def get_responses_path(self) -> str:
+        return self.paths[0].get()
 
-    def get_roster_path(self):
-        return self.roster_path
+    def get_rosters_path(self) -> str:
+        return self.paths[1].get()
 
-    def get_output_path(self):
-        return self.output_path
+    def get_output_path(self) -> str:
+        return self.paths[2].get()
+
+    def set_entry_error(self, i: int, e: Exception):
+        entry = self.entries[i]
+        entry.configure(
+            highlightbackground=styles.error_highlight_bg,
+            highlightthickness=styles.error_highlight_width)
+        self.paths[i].set(e)
+
+    def set_responses_error(self, e: Exception):
+        self.set_entry_error(0, e)
+
+    def set_rosters_error(self, e: Exception):
+        self.set_entry_error(1, e)
+
+    def set_output_error(self, e: Exception):
+        self.set_entry_error(2, e)
+
+    def clear_error(self, i: int):
+        self.entries[i].configure(
+            highlightbackground=styles.default_highlight_bg,
+            highlightthickness=styles.default_highlight_thickness)
+
+    def clear_paths(self):
+        for path in self.paths:
+            path.set('')

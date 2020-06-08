@@ -112,7 +112,6 @@ def main():
     #         sheet.to_excel(writer, sheet_name=course, index=False)
 
     gui = GUI()
-    gui.run()
 
 
 main()
