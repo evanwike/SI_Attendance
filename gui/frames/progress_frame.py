@@ -8,6 +8,7 @@ class ProgressFrame(tk.Frame):
         super().__init__(master)
         self.progress = IntVar()
         self.progress.set(0)
+
         # Update to get width of master frame
         tk.Tk.update(master)
         progress_bar = tk.ttk.Progressbar(

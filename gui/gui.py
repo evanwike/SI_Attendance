@@ -4,7 +4,7 @@ from .frames.io_frame import IOFrame
 from .frames.progress_frame import ProgressFrame
 from attendance.attendance import Attendance
 from attendance.exceptions import *
-from utils import open_file
+import utils
 
 
 class GUI:
