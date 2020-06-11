@@ -6,12 +6,11 @@ import gui.styles as styles
 
 class IOFrame(tk.Frame):
     def __init__(self, master=None):
-        super().__init__(master)
-        self.configure(
-            highlightbackground=styles.primary,
-            highlightthickness=styles.frame_border_width,
-            padx=styles.frame_padx,
-            pady=styles.frame_pady)
+        super().__init__(master,
+                         highlightbackground=styles.primary,
+                         highlightthickness=styles.frame_border_width,
+                         padx=styles.frame_padx,
+                         pady=styles.frame_pady)
 
         # Labels
         labels = [tk.Label(self, text='Response Workbook:'),
@@ -48,6 +47,7 @@ class IOFrame(tk.Frame):
 
     def browse_responses_path(self, event: object) -> None:
         # TODO: Fix / to work with OSX and Windows
+        # TODO: Remember to remove initialdirs
         self.clear_error(0)
         responses_path = tk.filedialog.askopenfilename(
             initialdir="/Users/Evan/SI_Attendance/data/",
@@ -70,6 +70,9 @@ class IOFrame(tk.Frame):
             title="Select where to save the output file.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004 Workbook", "*.xls")))
         self.paths[2].set(output_path)
+
+    def get_paths(self) -> list:
+        return [path.get() for path in self.paths]
 
     def get_responses_path(self) -> str:
         return self.paths[0].get()
@@ -100,7 +103,16 @@ class IOFrame(tk.Frame):
         self.entries[i].configure(
             highlightbackground=styles.default_highlight_bg,
             highlightthickness=styles.default_highlight_thickness)
+        # self.paths[i].set('')
+
+    def clear_errors(self):
+        for i in range(len(self.entries)):
+            self.clear_error(i)
 
     def clear_paths(self):
         for path in self.paths:
             path.set('')
+
+    def reset(self):
+        self.clear_errors()
+        self.clear_paths()

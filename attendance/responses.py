@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+# Microsoft Teams Attendance Form Responses
 class Responses:
     def __init__(self, path):
         self.path = path
