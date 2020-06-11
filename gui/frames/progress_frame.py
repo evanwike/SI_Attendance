@@ -18,7 +18,6 @@ class ProgressFrame(tk.Frame):
             variable=self.progress,
             length=self.master.winfo_width())
 
-        progress_bar.pack()
         self.progress_bar = progress_bar
 
     def set_progress_bar(self, num_responses):
@@ -27,3 +26,13 @@ class ProgressFrame(tk.Frame):
     def update_progress_bar(self):
         self.progress.set(self.progress.get() + 1)
         self.progress_bar.update()
+
+    def reset(self):
+        self.progress.set(0)
+        self.progress_bar.destroy()
+
+    def hide_progress_bar(self):
+        self.progress_bar.pack_forget()
+
+    def show_progress_bar(self):
+        self.progress_bar.pack()

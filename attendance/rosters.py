@@ -1,5 +1,4 @@
 import pandas as pd
-import openpyxl
 
 
 # Section Rosters
@@ -8,19 +7,18 @@ class Rosters:
     def __init__(self, path):
         self.path = path
 
+        weeks = 8
+        names = ['ID', 'Name'] + [f'Week {i+1}' for i in range(weeks)] + ['Total', '', '', '']
+
         try:
-            self.workbook = {
-                course: sheet.fillna(0) for (course, sheet) in
-                pd.read_excel(
-                    path,
-                    sheet_name=None,
-                    usecols='A:K',
-                    dtype={'ID': str}
-                ).items()}
-            self.write_workbook = openpyxl.load_workbook(
+            # FIXME: Dynamic columns to allow for 8 or 16 week
+            self.workbook = pd.read_excel(
                 path,
-                read_only=False,
-                keep_vba=True)
+                sheet_name=None,
+                usecols='A:N',
+                dtype={'ID': str},
+                names=names
+            )
         except OSError as e:
             raise e
         except Exception as e:
@@ -57,10 +55,10 @@ class Rosters:
             return row
 
     def increment_student(self, course: str, row: int, col: int) -> None:
-        sheet = self.write_workbook[course]
-        cell = sheet.cell(row=row, column=col)
-        cell.value = 1 if cell.value is None else cell.value + 1
-        print(cell)
-
-    def save(self):
-        self.write_workbook.save()
+        sheet = self.workbook[course]
+        val = sheet.iat[row, col]
+        sheet.iat[row, col] = 1 if type(val) != int else val + 1
+        # sheet.iat[row, col] =
+        # a = sheet.iat[row, col]
+        # print(type(a), a)
+        # sheet.iat[row, col] += 1

@@ -1,70 +1,88 @@
-import tkinter as tk
 from tkinter.ttk import Style
 from .frames.io_frame import IOFrame
+from .frames.options_frame import OptionsFrame
 from .frames.progress_frame import ProgressFrame
+from .frames.button_frame import ButtonFrame
 from attendance.attendance import Attendance
-from attendance.exceptions import *
+from exceptions import *
 import utils
 
 
 class GUI:
     def __init__(self):
+        self.output_path = ''
         self.window = tk.Tk()
         self.window.title('SI Attendance')
 
-        tk.Label(self.window, text='2. Select input/output file locations.').grid(row=0, column=0, sticky='w',
-                                                                                  padx=(5, 0),
-                                                                                  pady=(10, 0))
-        io_frame = IOFrame(self.window)
-        io_frame.grid(row=1, column=0)
+        # Root frame for padding
+        root = tk.Frame(self.window, width=500)
+        root.grid(row=0, column=0, padx=20, pady=20)
+        self.root = root
+
+        # tk.Label(root, text='2. Select input/output file locations.').grid(row=0, column=0, sticky='w', pady=(10, 0))
+        tk.Label(root, text='File I/O').grid(row=0, column=0, sticky='w')
+        io_frame = IOFrame(root)
+        io_frame.grid(row=1, column=0, sticky='nsew')
         self.io_frame = io_frame
 
-        Style().theme_use('clam')   # Progress bar theme
-        progress_frame = ProgressFrame(self.window)
-        progress_frame.grid(row=2, column=0, sticky='e', pady=10, padx=10)
+        tk.Label(root, text='Options').grid(row=2, column=0, sticky='w', pady=(10, 0))
+        options_frame = OptionsFrame(root)
+        options_frame.grid(row=3, column=0, sticky='nsew')
+        self.options_frame = options_frame
+
+        Style().theme_use('clam')  # Progress bar theme
+        progress_frame = ProgressFrame(root)
+        progress_frame.grid(row=4, column=0, pady=10, sticky='nsew')
         self.progress_frame = progress_frame
 
-        btn_open = tk.Button(self.window, text='Open', width=10)
-        btn_open.bind('<Button-1>', self.open)
-        btn_open.grid(row=3, column=0, sticky='w', pady=(0, 10), padx=(10, 0))
-        btn_open.grid_forget()
-        self.btn_open = btn_open
+        button_frame = ButtonFrame(self.open, self.reset, self.run, root)
+        button_frame.grid(row=5, column=0, pady=(0, 10), sticky='nsew')
+        self.button_frame = button_frame
 
-        btn_run = tk.Button(self.window, text='Run', width=10)
-        btn_run.bind('<Button-1>', self.run)
-        btn_run.grid(row=3, column=0, sticky='e', pady=(0, 10), padx=(0, 10))
-
-        self.output_path = ''
-        self.window.mainloop()
+        root.mainloop()
 
     def run(self, event: object) -> None:
-        responses_path = self.io_frame.get_responses_path()
-        rosters_path = self.io_frame.get_rosters_path()
-        output_path = self.io_frame.get_output_path()
+        # TODO: Validate paths
+        # TODO: Validate week
+        paths = self.io_frame.get_paths()
+        self.io_frame.clear_errors()
+        self.options_frame.clear_error()
 
         try:
-            attendance = Attendance(responses_path, rosters_path, output_path, self.progress_frame)
+            week = self.options_frame.get_week()
+            attendance = Attendance(*paths, week, self.progress_frame)
             self.progress_frame.set_progress_bar(attendance.responses.get_num_responses())
+            self.progress_frame.show_progress_bar()
 
             if attendance.run():
                 self.success()
 
+        except ResponsesPathError as e:
+            self.io_frame.set_responses_error(e)
+        except RostersPathError as e:
+            self.io_frame.set_rosters_error(e)
+        except OutputPathError as e:
+            self.io_frame.set_output_error(e)
         except ResponsesError as e:
             self.io_frame.set_responses_error(e)
         except RostersError as e:
-            print('Rosters Error')
-            print(e)
+            self.io_frame.set_rosters_error(e)
+        except tk.TclError as e:
+            self.options_frame.set_week_error(WeekTypeError('Invalid'))
         except Exception as e:
             print(e)
 
     def success(self):
         self.output_path = self.io_frame.get_output_path()
-        self.io_frame.clear_paths()
         # Reveal open button
-        self.btn_open.grid(row=3, column=0, sticky='w', pady=(0, 10), padx=(10, 0))
+        self.button_frame.show_open_button()
 
-    def open(self, event: object):
-        open_file(self.output_path)
+    def reset(self, event: object) -> None:
+        self.io_frame.reset()
+        self.options_frame.reset()
+        self.progress_frame.reset()
+        self.button_frame.reset()
+
+    def open(self, event: object) -> None:
+        utils.open_file(self.output_path)
         self.output_path = ''
-        # Hide open button
-        self.btn_open.grid_forget()

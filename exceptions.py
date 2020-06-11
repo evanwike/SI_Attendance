@@ -1,3 +1,6 @@
+import tkinter as tk
+
+
 class ResponsesError(OSError):
     def __init__(self, e: str):
         self.e = e
@@ -24,7 +27,7 @@ class RostersPathError(RostersError):
         super().__init__(e)
 
 
-class OutputError:
+class OutputError(OSError):
     def __init__(self, e: str):
         self.e = e
 
@@ -33,5 +36,15 @@ class OutputError:
 
 
 class OutputPathError(OutputError):
+    def __init__(self, e: str):
+        super().__init__(e)
+
+
+class WeekError(tk.TclError):
+    def __init__(self, e: str):
+        super().__init__(e)
+
+
+class WeekTypeError(WeekError):
     def __init__(self, e: str):
         super().__init__(e)

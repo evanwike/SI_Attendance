@@ -1,20 +1,21 @@
 import pandas as pd
-import logging
 import utils
 from .responses import Responses
 from .rosters import Rosters
-from .exceptions import *
+from exceptions import *
 from gui.frames.progress_frame import ProgressFrame
 
 
 class Attendance:
-    def __init__(self, responses_path: str, rosters_path: str, progress_frame: ProgressFrame):
+    def __init__(self,
+                 responses_path: str,
+                 rosters_path: str,
+                 output_path: str,
+                 week: int,
+                 progress_frame: ProgressFrame):
+        self.output_path = output_path
+        self.week = week    # FIXME
         self.progress_frame = progress_frame
-
-        if not responses_path:
-            raise ResponsesPathError('Required')
-        if not rosters_path:
-            raise RostersPathError('Required')
 
         try:
             self.responses = Responses(responses_path)
@@ -41,10 +42,8 @@ class Attendance:
             if row is not None:
                 # Found student in current sheet
                 # TODO: Get week as input
-                # Ignore headers, OpenPyXl indexing starts from 1
-                row += 2
                 # Ignore first 2 columns [ID, Name], OpenPyXl indexing starts from 1
-                col = 3 + utils.get_week(date)
+                col = 2 + utils.get_week(date)
                 self.rosters.increment_student(course, row, col)
             else:
                 # Unable to find student in sheet, search other sheets
@@ -60,11 +59,16 @@ class Attendance:
         self.progress_frame.update_progress_bar()
 
     def run(self) -> bool:
-        # TODO: Rework how it writes to Excel
-        # Move writing to parse_response
         self.responses.workbook.apply(self.parse_response, axis=1)
-        self.rosters.write_workbook.save()
+
+        # TODO: Add overwrite current workbook checkbox
+        with pd.ExcelWriter(self.output_path, engine='xlsxwriter') as writer:
+            for course, sheet in self.rosters.workbook.items():
+                # Convert string IDs back to ints
+                sheet['ID'] = sheet['ID'].astype(int)
+                # Output last 3 columns (stats columns) with empty headers
+                header = sheet.columns.values[:-3].tolist() + ['', '', '']
+
+                sheet.to_excel(writer, sheet_name=course, index=False, header=header)
+
         return True
-        # with pd.ExcelWriter(self.rosters.path, engine='xlsxwriter') as writer:
-        #     for course, sheet in self.rosters.workbook.items():
-        #         sheet.to_excel(writer, sheet_name=course, index=False)
