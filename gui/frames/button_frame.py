@@ -4,7 +4,7 @@ import gui.styles as styles
 
 class ButtonFrame(tk.Frame):
     def __init__(self,
-                 open: callable,
+                 _open: callable,
                  reset: callable,
                  run: callable,
                  master=None):
@@ -15,7 +15,7 @@ class ButtonFrame(tk.Frame):
         btn_reset.pack(side='left')
 
         btn_open = tk.Button(self, text='Open', width=10)
-        btn_open.bind('<Button-1>', open)
+        btn_open.bind('<Button-1>', _open)
         self.btn_open = btn_open
 
         btn_run = tk.Button(self, text='Run', width=10)

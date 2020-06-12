@@ -46,7 +46,7 @@ class IOFrame(tk.Frame):
             button.grid(row=i, column=2)
 
     def browse_responses_path(self, event: object) -> None:
-        # TODO: Fix / to work with OSX and Windows
+        # TODO: Fix "/" to work with OSX and Windows
         # TODO: Remember to remove initialdirs
         self.clear_error(0)
         responses_path = tk.filedialog.askopenfilename(

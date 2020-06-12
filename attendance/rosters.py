@@ -8,13 +8,10 @@ class Rosters:
         self.path = path
 
         try:
-            # FIXME: Dynamic columns to allow for 8 or 16 week
             self.workbook = pd.read_excel(
                 path,
                 sheet_name=None,
-                usecols='A:N',
-                dtype={'ID': str}
-            )
+                dtype={'ID': str})
         except OSError as e:
             raise e
         except Exception as e:
@@ -54,7 +51,3 @@ class Rosters:
         sheet = self.workbook[course]
         val = sheet.iat[row, col]
         sheet.iat[row, col] = 1 if type(val) != int else val + 1
-        # sheet.iat[row, col] =
-        # a = sheet.iat[row, col]
-        # print(type(a), a)
-        # sheet.iat[row, col] += 1

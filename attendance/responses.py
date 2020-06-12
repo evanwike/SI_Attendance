@@ -2,10 +2,11 @@ import pandas as pd
 
 
 # Microsoft Teams Attendance Form Responses
+# TODO: Possibly add support to dynamically choose columns
 class Responses:
     def __init__(self, path):
         self.path = path
-        # TODO: Possibly add support to dynamically choose columns
+
         try:
             self.workbook = pd.read_excel(
                 path,

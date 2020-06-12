@@ -15,7 +15,7 @@ class Attendance:
                  week: int,
                  progress_frame: ProgressFrame):
         self.output_path = output_path
-        self.week = week    # FIXME
+        self.week = week  # FIXME
         self.progress_frame = progress_frame
 
         try:
@@ -40,23 +40,25 @@ class Attendance:
             # 1. Search by _id in current course sheet
             row = self.rosters.search_sheet_by_id(_id, course)
 
+            # Found student in current sheet
             if row is not None:
-                # Found student in current sheet
-                # TODO: Get week as input
+                # TODO: Validate responses match week
                 # Ignore first 2 columns [ID, Name], OpenPyXl indexing starts from 1
-                col = 2 + utils.get_week(date)
+                col = 2 + self.week
+                # col = 2 + utils.get_week(date)
                 self.rosters.increment_student(course, row, col)
+            # Unable to find student in sheet, search other sheets
             else:
-                # Unable to find student in sheet, search other sheets
                 print(f'\tSearching for student "{last}" in other sheets...')
-                # TODO: This would be easier if I had the times for each session - can't assume same student in
-                #  different course because they could be in multiple sessions
+                # TODO: This would be easier if I had session times - can't assume student in different course is the
+                #  same, as they could be in multiple sessions.
         else:
             print(f'\tUnable to find course "{course}" in attendance workbook.')
             # TODO: Find most probable course student belongs to
         print()
 
         # Update progress bar
+        # TODO: Make this include writing data to Excel
         self.progress_frame.update_progress_bar()
 
     def run(self) -> bool:
@@ -66,7 +68,7 @@ class Attendance:
             border = writer.book.add_format({'border': 1})
             border_center = writer.book.add_format({'border': 1, 'align': 'center'})
             percent = writer.book.add_format()
-            percent.set_num_format(9)   # 0%
+            percent.set_num_format(9)  # 0%
 
             # Manually write each cell in each sheet for formatting
             for course, df in self.rosters.workbook.items():
@@ -90,22 +92,19 @@ class Attendance:
                 rows, cols = df.shape
 
                 # For each column
-                for i in range(cols - 4):   # Ignore last 3 (stats) columns and total column
+                for i in range(cols - 4):     # Ignore last 3 (stats) columns and total column
                     col = df.iloc[:, i]
-                    _format = border if i < 2 else border_center
                     # For each row
                     for j, val in enumerate(col):
-                        if pd.isna(val):
-                            # Write blank cell and format if cell has no value
-                            worksheet.write(j+1, i, None, _format)
-                        else:
-                            # Write value to cell and format
-                            worksheet.write(j+1, i, val, _format)
+                        # Write cells
+                        worksheet.write(j + 1, i,
+                                        None if pd.isna(val) else val,          # Write value if value, else blank
+                                        border if i < 2 else border_center)     # Only center cells after first 2 cols
 
                 # Write formulas to Total column
-                total_i = cols - 4
-                for i in range(1, rows+1):
-                    _range = xl_range(i, 2, i, total_i-1)    # FIXME: Make dynamic for 8/16
+                total_i = cols - 4          # FIXME: What if empty cols after?
+                for i in range(1, rows + 1):
+                    _range = xl_range(i, 2, i, total_i - 1)
                     worksheet.write_formula(i, total_i, f'=SUM({_range})', cell_format=border_center)
 
                 # Write stats formulas

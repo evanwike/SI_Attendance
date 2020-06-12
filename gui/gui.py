@@ -8,6 +8,8 @@ from exceptions import *
 import utils
 
 
+# TODO: Add error message frame
+# TODO: Remove error messages from text entries
 class GUI:
     def __init__(self):
         self.output_path = ''
@@ -74,7 +76,7 @@ class GUI:
         # except Exception as e:
         #     print(e)
 
-    def success(self):
+    def success(self) -> None:
         self.output_path = self.io_frame.get_output_path()
         # Reveal open button
         self.button_frame.show_open_button()
@@ -87,4 +89,3 @@ class GUI:
 
     def open(self, event: object) -> None:
         utils.open_file(self.output_path)
-        # self.output_path = ''
