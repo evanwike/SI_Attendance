@@ -40,11 +40,11 @@ class OutputPathError(OutputError):
         super().__init__(e)
 
 
-class WeekError(tk.TclError):
+class WeekTypeError(tk.TclError):
     def __init__(self, e: str):
         super().__init__(e)
 
 
-class WeekTypeError(WeekError):
+class WeekRangeError(Exception):
     def __init__(self, e: str):
         super().__init__(e)

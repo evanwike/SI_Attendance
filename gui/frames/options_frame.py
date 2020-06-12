@@ -1,5 +1,6 @@
 import tkinter as tk
 import gui.styles as styles
+from exceptions import WeekRangeError
 
 
 class OptionsFrame(tk.Frame):
@@ -18,7 +19,10 @@ class OptionsFrame(tk.Frame):
         self.week_entry = week_entry
 
     def get_week(self):
-        return self.week.get()
+        week = self.week.get()
+        if week < 1 or week > 16:
+            raise WeekRangeError('Week must be in range: [1, 16]')
+        return week
 
     def set_week_error(self, e: Exception):
         self.week_entry.configure(

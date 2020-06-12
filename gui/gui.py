@@ -67,10 +67,12 @@ class GUI:
             self.io_frame.set_responses_error(e)
         except RostersError as e:
             self.io_frame.set_rosters_error(e)
-        except tk.TclError as e:
+        except tk.TclError:
             self.options_frame.set_week_error(WeekTypeError('Invalid'))
-        except Exception as e:
-            print(e)
+        except WeekRangeError as e:
+            self.options_frame.set_week_error(e)
+        # except Exception as e:
+        #     print(e)
 
     def success(self):
         self.output_path = self.io_frame.get_output_path()
@@ -85,4 +87,4 @@ class GUI:
 
     def open(self, event: object) -> None:
         utils.open_file(self.output_path)
-        self.output_path = ''
+        # self.output_path = ''

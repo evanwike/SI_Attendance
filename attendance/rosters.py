@@ -7,17 +7,13 @@ class Rosters:
     def __init__(self, path):
         self.path = path
 
-        weeks = 8
-        names = ['ID', 'Name'] + [f'Week {i+1}' for i in range(weeks)] + ['Total', '', '', '']
-
         try:
             # FIXME: Dynamic columns to allow for 8 or 16 week
             self.workbook = pd.read_excel(
                 path,
                 sheet_name=None,
                 usecols='A:N',
-                dtype={'ID': str},
-                names=names
+                dtype={'ID': str}
             )
         except OSError as e:
             raise e

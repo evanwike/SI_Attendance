@@ -50,7 +50,7 @@ class IOFrame(tk.Frame):
         # TODO: Remember to remove initialdirs
         self.clear_error(0)
         responses_path = tk.filedialog.askopenfilename(
-            initialdir="/Users/Evan/SI_Attendance/data/",
+            initialdir="/Users/Evan/SI_Attendance/data/Responses.xlsx",
             title="Select the Responses Workbook.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004", "*.xls")))
         self.paths[0].set(responses_path)
@@ -58,7 +58,7 @@ class IOFrame(tk.Frame):
     def browse_rosters_path(self, event: object) -> None:
         self.clear_error(1)
         roster_path = tk.filedialog.askopenfilename(
-            initialdir="/Users/Evan/SI_Attendance/data/",
+            initialdir="/Users/Evan/SI_Attendance/data/Attendance_S20.xlsx",
             title="Select the Rosters Workbook.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004 Workbook", "*.xls")))
         self.paths[1].set(roster_path)
@@ -66,7 +66,7 @@ class IOFrame(tk.Frame):
     def save_output_path(self, event: object) -> None:
         self.clear_error(2)
         output_path = filedialog.asksaveasfilename(
-            initialdir="/Users/Evan/downloads/",
+            initialdir="/Users/Evan/downloads/5.xlsx",
             title="Select where to save the output file.",
             filetypes=(("Excel Workbook", "*.xlsx"), ("Excel 97-2004 Workbook", "*.xls")))
         self.paths[2].set(output_path)
