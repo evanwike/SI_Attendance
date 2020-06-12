@@ -1,6 +1,5 @@
 import tkinter as tk
 import gui.styles as styles
-from exceptions import WeekRangeError
 
 
 class OptionsFrame(tk.Frame):
@@ -14,30 +13,24 @@ class OptionsFrame(tk.Frame):
         self.week = tk.IntVar()
         self.week.set(1)    # Default to week 1
         tk.Label(self, text='Week #:').grid(row=0, column=0)
-        week_entry = tk.Entry(self, textvariable=self.week, width=10)
+        week_entry = tk.Entry(self, textvariable=self.week, width=2)
         week_entry.grid(row=0, column=1, sticky='w')
         self.week_entry = week_entry
 
     def get_week(self):
-        week = self.week.get()
-        if week < 1 or week > 16:
-            raise WeekRangeError('Week must be in range: [1, 16]')
-        return week
+        # Validated in attendance.py
+        return self.week.get()
 
-    def set_week_error(self, e: Exception):
+    def set_week_error(self):
         self.week_entry.configure(
             highlightbackground=styles.error_highlight_bg,
             highlightthickness=styles.error_highlight_width)
-        self.week.set(e)
 
     def clear_error(self):
         self.week_entry.configure(
             highlightbackground=styles.default_highlight_bg,
             highlightthickness=styles.default_highlight_thickness)
 
-    def clear_week(self):
-        self.week.set('')
-
     def reset(self):
         self.clear_error()
-        self.clear_week()
+        self.week.set(1)

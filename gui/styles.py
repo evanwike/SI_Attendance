@@ -12,3 +12,4 @@ error_highlight_width = 2
 
 default_highlight_bg = 'systemWindowBody'
 default_highlight_thickness = 3
+

@@ -3,13 +3,13 @@ from .frames.io_frame import IOFrame
 from .frames.options_frame import OptionsFrame
 from .frames.progress_frame import ProgressFrame
 from .frames.button_frame import ButtonFrame
+from .frames.error_frame import ErrorFrame
 from attendance.attendance import Attendance
 from exceptions import *
 import utils
 
 
-# TODO: Add error message frame
-# TODO: Remove error messages from text entries
+# TODO: Fix reset method
 class GUI:
     def __init__(self):
         self.output_path = ''
@@ -21,7 +21,6 @@ class GUI:
         root.grid(row=0, column=0, padx=20, pady=20)
         self.root = root
 
-        # tk.Label(root, text='2. Select input/output file locations.').grid(row=0, column=0, sticky='w', pady=(10, 0))
         tk.Label(root, text='File I/O').grid(row=0, column=0, sticky='w')
         io_frame = IOFrame(root)
         io_frame.grid(row=1, column=0, sticky='nsew')
@@ -41,6 +40,10 @@ class GUI:
         button_frame.grid(row=5, column=0, pady=(0, 10), sticky='nsew')
         self.button_frame = button_frame
 
+        error_frame = ErrorFrame(root)
+        error_frame.grid(row=6, column=0, sticky='nsew')
+        self.error_frame = error_frame
+
         root.mainloop()
 
     def run(self, event: object) -> None:
@@ -49,6 +52,7 @@ class GUI:
         paths = self.io_frame.get_paths()
         self.io_frame.clear_errors()
         self.options_frame.clear_error()
+        self.error_frame.clear_error()
 
         try:
             week = self.options_frame.get_week()
@@ -60,27 +64,35 @@ class GUI:
                 self.success()
 
         except ResponsesPathError as e:
-            self.io_frame.set_responses_error(e)
+            self.error_frame.set_error(e)
+            self.io_frame.set_responses_error()
         except RostersPathError as e:
-            self.io_frame.set_rosters_error(e)
+            self.error_frame.set_error(e)
+            self.io_frame.set_rosters_error()
         except OutputPathError as e:
-            self.io_frame.set_output_error(e)
+            self.error_frame.set_error(e)
+            self.io_frame.set_output_error()
         except ResponsesError as e:
-            self.io_frame.set_responses_error(e)
+            self.error_frame.set_error(e)
+            self.io_frame.set_responses_error()
         except RostersError as e:
-            self.io_frame.set_rosters_error(e)
+            self.error_frame.set_error(e)
+            self.io_frame.set_rosters_error()
         except tk.TclError:
-            self.options_frame.set_week_error(WeekTypeError('Invalid'))
+            self.error_frame.set_error(WeekTypeError('Please enter a valid week number.'))
+            self.options_frame.set_week_error()
         except WeekRangeError as e:
-            self.options_frame.set_week_error(e)
-        # except Exception as e:
-        #     print(e)
+            self.error_frame.set_error(e)
+            self.options_frame.set_week_error()
+        except Exception as e:
+            print(e)
 
     def success(self) -> None:
         self.output_path = self.io_frame.get_output_path()
         # Reveal open button
         self.button_frame.show_open_button()
 
+    # FIXME: Throws week error when resetting, with valid default week number = 1
     def reset(self, event: object) -> None:
         self.io_frame.reset()
         self.options_frame.reset()

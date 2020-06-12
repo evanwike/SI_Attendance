@@ -15,7 +15,7 @@ class Attendance:
                  week: int,
                  progress_frame: ProgressFrame):
         self.output_path = output_path
-        self.week = week  # FIXME
+        self.week = week
         self.progress_frame = progress_frame
 
         try:
@@ -27,6 +27,11 @@ class Attendance:
             self.rosters = Rosters(rosters_path)
         except OSError as e:
             raise RostersError(e.strerror)
+
+        # Validate week #
+        upper_bound = self.rosters.get_week_bound()
+        if self.week < 1 or self.week > upper_bound:
+            raise WeekRangeError(f'Week must be in the range [1, {upper_bound}]')
 
     def parse_response(self, response: pd.Series):
         date, last, _id, course = response

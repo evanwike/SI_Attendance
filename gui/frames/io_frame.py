@@ -83,27 +83,25 @@ class IOFrame(tk.Frame):
     def get_output_path(self) -> str:
         return self.paths[2].get()
 
-    def set_entry_error(self, i: int, e: Exception):
+    def set_entry_error(self, i: int):
         entry = self.entries[i]
         entry.configure(
             highlightbackground=styles.error_highlight_bg,
             highlightthickness=styles.error_highlight_width)
-        self.paths[i].set(e)
 
-    def set_responses_error(self, e: Exception):
-        self.set_entry_error(0, e)
+    def set_responses_error(self):
+        self.set_entry_error(0)
 
-    def set_rosters_error(self, e: Exception):
-        self.set_entry_error(1, e)
+    def set_rosters_error(self):
+        self.set_entry_error(1)
 
-    def set_output_error(self, e: Exception):
-        self.set_entry_error(2, e)
+    def set_output_error(self):
+        self.set_entry_error(2)
 
     def clear_error(self, i: int):
         self.entries[i].configure(
             highlightbackground=styles.default_highlight_bg,
             highlightthickness=styles.default_highlight_thickness)
-        # self.paths[i].set('')
 
     def clear_errors(self):
         for i in range(len(self.entries)):

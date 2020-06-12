@@ -14,8 +14,12 @@ class Rosters:
                 dtype={'ID': str})
         except OSError as e:
             raise e
-        except Exception as e:
-            print(e)
+
+        # Detect upper bound of week
+        i = 0
+        while f'Week {i + 1}' in next(iter(self.workbook.values())):
+            i += 1
+        self.week_bound = i
 
     def search_sheet_by_id(self, _id: str, course: str) -> int:
         sheet = self.workbook[course]
@@ -51,3 +55,6 @@ class Rosters:
         sheet = self.workbook[course]
         val = sheet.iat[row, col]
         sheet.iat[row, col] = 1 if type(val) != int else val + 1
+
+    def get_week_bound(self) -> int:
+        return self.week_bound
