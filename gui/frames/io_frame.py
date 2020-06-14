@@ -27,7 +27,7 @@ class IOFrame(tk.Frame):
         for i, entry in enumerate(self.entries):
             entry.grid(row=i, column=1)
 
-        # Set defaults to clear errors
+        # Get and set default OS styling for error resets
         styles.default_highlight_bg = self.entries[0].cget('highlightbackground')
         styles.default_highlight_thickness = self.entries[0].cget('highlightthickness')
 

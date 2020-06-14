@@ -10,7 +10,7 @@ class Responses:
         try:
             self.workbook = pd.read_excel(
                 path,
-                usecols='C,F:H',
+                usecols='C,E:G',
                 names=['Date', 'Last', 'ID', 'Course'],
                 dtype={'ID': str})
         except OSError as e:

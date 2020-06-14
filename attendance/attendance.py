@@ -41,22 +41,18 @@ class Attendance:
 
         if course in self.rosters.workbook:
             print(f'\tCourse found in attendance workbook: {course}')
-
-            # 1. Search by _id in current course sheet
-            row = self.rosters.search_sheet_by_id(_id, course)
+            row = self.rosters.find_student_in_sheet(_id, last, course)
 
             # Found student in current sheet
             if row is not None:
                 # TODO: Validate responses match week
-                # Ignore first 2 columns [ID, Name], OpenPyXl indexing starts from 1
-                col = 2 + self.week
+                # Ignore first 2 columns [ID, Name], indexing starts from 0
+                col = 1 + self.week
                 # col = 2 + utils.get_week(date)
                 self.rosters.increment_student(course, row, col)
             # Unable to find student in sheet, search other sheets
             else:
-                print(f'\tSearching for student "{last}" in other sheets...')
-                # TODO: This would be easier if I had session times - can't assume student in different course is the
-                #  same, as they could be in multiple sessions.
+                print('\tUnable to find student. Marking response.')
         else:
             print(f'\tUnable to find course "{course}" in attendance workbook.')
             # TODO: Find most probable course student belongs to

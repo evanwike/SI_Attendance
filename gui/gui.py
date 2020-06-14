@@ -7,6 +7,7 @@ from .frames.error_frame import ErrorFrame
 from attendance.attendance import Attendance
 from exceptions import *
 import utils
+import traceback
 
 
 # TODO: Fix reset method
@@ -85,7 +86,7 @@ class GUI:
             self.error_frame.set_error(e)
             self.options_frame.set_week_error()
         except Exception as e:
-            print(e)
+            traceback.print_tb(e.__traceback__)
 
     def success(self) -> None:
         self.output_path = self.io_frame.get_output_path()
