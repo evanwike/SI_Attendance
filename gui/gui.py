@@ -1,19 +1,13 @@
 from tkinter.ttk import Style
-from .frames.io_frame import IOFrame
-from .frames.options_frame import OptionsFrame
-from .frames.progress_frame import ProgressFrame
-from .frames.button_frame import ButtonFrame
-from .frames.error_frame import ErrorFrame
+from .frames import IOFrame, OptionsFrame, ProgressFrame, ButtonFrame, ErrorFrame
 from attendance.attendance import Attendance
 from exceptions import *
 import utils
-import traceback
 
 
-# TODO: Fix reset method
 class GUI:
     def __init__(self):
-        self.output_path = ''
+        self.rosters_path = ''
         self.window = tk.Tk()
         self.window.title('SI Attendance')
 
@@ -22,7 +16,7 @@ class GUI:
         root.grid(row=0, column=0, padx=20, pady=20)
         self.root = root
 
-        tk.Label(root, text='File I/O').grid(row=0, column=0, sticky='w')
+        tk.Label(root, text='Workbooks').grid(row=0, column=0, sticky='w')
         io_frame = IOFrame(root)
         io_frame.grid(row=1, column=0, sticky='nsew')
         self.io_frame = io_frame
@@ -48,20 +42,21 @@ class GUI:
         root.mainloop()
 
     def run(self, event: object) -> None:
-        # TODO: Validate paths
-        # TODO: Validate week
-        paths = self.io_frame.get_paths()
+        responses_path = self.io_frame.get_responses_path()
+        rosters_path = self.io_frame.get_rosters_path()
+        self.rosters_path = rosters_path
+
         self.io_frame.clear_errors()
         self.options_frame.clear_error()
         self.error_frame.clear_error()
 
         try:
             week = self.options_frame.get_week()
-            attendance = Attendance(*paths, week, self.progress_frame)
+            attendance = Attendance(responses_path, rosters_path, week, self.progress_frame)
             self.progress_frame.set_progress_bar(attendance.responses.get_num_responses())
             self.progress_frame.show_progress_bar()
 
-            if attendance.run():
+            if attendance.tally_responses():
                 self.success()
 
         except ResponsesPathError as e:
@@ -70,30 +65,27 @@ class GUI:
         except RostersPathError as e:
             self.error_frame.set_error(e)
             self.io_frame.set_rosters_error()
-        except OutputPathError as e:
-            self.error_frame.set_error(e)
-            self.io_frame.set_output_error()
         except ResponsesError as e:
             self.error_frame.set_error(e)
             self.io_frame.set_responses_error()
         except RostersError as e:
             self.error_frame.set_error(e)
             self.io_frame.set_rosters_error()
-        except tk.TclError:
-            self.error_frame.set_error(WeekTypeError('Please enter a valid week number.'))
+        except tk.TclError as e:
+            print(e)
+            self.error_frame.set_error(WeekTypeError('Enter a valid week number.'))
             self.options_frame.set_week_error()
         except WeekRangeError as e:
             self.error_frame.set_error(e)
             self.options_frame.set_week_error()
-        except Exception as e:
-            traceback.print_tb(e.__traceback__)
+        # except Exception as e:
+        #     print('EXCEPTION')
+        #     traceback.print_tb(e.__traceback__)
 
     def success(self) -> None:
-        self.output_path = self.io_frame.get_output_path()
         # Reveal open button
         self.button_frame.show_open_button()
 
-    # FIXME: Throws week error when resetting, with valid default week number = 1
     def reset(self, event: object) -> None:
         self.io_frame.reset()
         self.options_frame.reset()
@@ -101,4 +93,4 @@ class GUI:
         self.button_frame.reset()
 
     def open(self, event: object) -> None:
-        utils.open_file(self.output_path)
+        utils.open_file(self.rosters_path)
