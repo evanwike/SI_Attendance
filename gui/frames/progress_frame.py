@@ -29,7 +29,6 @@ class ProgressFrame(tk.Frame):
 
     def reset(self):
         self.progress.set(0)
-        self.progress_bar.destroy()
 
     def hide_progress_bar(self):
         self.progress_bar.pack_forget()

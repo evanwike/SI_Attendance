@@ -18,7 +18,6 @@ class OptionsFrame(tk.Frame):
         self.week_entry = week_entry
 
     def get_week(self):
-        # Validated in attendance.py
         return self.week.get()
 
     def set_week_error(self):
